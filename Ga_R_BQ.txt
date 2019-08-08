@@ -1,0 +1,93 @@
+packages<-function(name){
+  if(!name %in% installed.packages()){
+    install.packages(name,repos = "http://cran.us.r-project.org")
+  }
+}
+
+packages("googleCloudStorageR")
+packages("RGoogleAnalytics")
+packages("googleAuthR")
+packages("googleAnalyticsR")
+packages("bigrquery")
+packages("lubridate")
+packages("stringr")
+packages("dplyr")
+packages("sqldf")
+packages("devtools")
+packages("readr")
+packages("jsonlite")
+
+library(googleCloudStorageR)
+library(RGoogleAnalytics)
+library(googleAuthR)
+library(googleAnalyticsR)
+
+
+options(googleAuthR.scopes.selected = c("https://www.googleapis.com/auth/analytics", 
+                                        "https://www.googleapis.com/auth/bigquery",
+                                        "https://www.googleapis.com/auth/cloud-platform"))
+
+# you may also set the client id and secret here as well
+options(googleAuthR.client_id = "xxxxxxxxxxxxxxxx.apps.googleusercontent.com",
+        googleAuthR.client_secret = "xxxxxxxxxxxxxx")
+
+# authenticate and go through the OAuth2 flow first time - specify a filename to save to by passing it in
+
+token<-gar_auth("sc_ga.httr-oauth")
+if (!token$validate()) {
+  token<-token$refresh()
+  message("Access Token successfully updated.")
+} else {
+  message("Access Token is valid.")
+}
+
+startdt<-"2018-12-16"
+enddt<-"2018-12-17"
+
+selectedDimensions <- c("ga:dimension1",
+                        "ga:dimension3")
+
+result_1 <- google_analytics(
+  c("123456789"),
+  date_range = c(startdt,enddt),
+  metrics = c("eventValue"),
+  dimensions = selectedDimensions,
+  anti_sample = TRUE
+)
+
+
+library(bigrquery)
+library(stringr)
+library(dplyr)
+library(sqldf)
+library(devtools)
+library(readr)
+library(jsonlite)
+
+project<-"project_1"
+
+dataset<- "GaToRstudio"
+
+xpath<- "project_1.GaToRstudio.TestCreate"
+
+delpath<- "project_1.GaToRstudio.TestCreate"
+
+copypath<-"project_1.GaToRstudio.TestCreate2"
+
+
+
+sql <- "SELECT * FROM [project_1:GaToRstudio.TestCreate] "
+
+obj<-fromJSON(readLines("gabqintegration_a8688839cd9f.json"))
+
+bq_auth(email="abc@example",path=obj)
+
+tab1<-query_exec(sql, project = project)
+
+tab1<-rbind(tab1, resultdata)
+
+bq_table_delete(delpath)
+
+bq_table_create(xpath, field = tab1)
+
+bq_table_upload(xpath, tab1, quiet = FALSE)
