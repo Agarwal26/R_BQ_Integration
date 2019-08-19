@@ -1,0 +1,44 @@
+library(googleAnalyticsR)
+#Authorize Google Analytics R- this will open a webpage
+ga_auth()
+#code to check the accounts you have access to
+my_accounts <- google_analytics_account_list()
+View(my_accounts)
+#Use my_accounts to find the viewId. Make sure to replace this with your viewId.
+my_id <- 94579701
+selectedDimensions <- c("ga:dimension1",
+        "ga:dimension3",
+        "ga:dimension18",
+        "ga:dimension2",
+        "ga:dimension14",
+        "ga:dimension12",
+        "ga:dimension13"
+    )
+#set date range
+startdt<-"2018-04-01"
+enddt<-"2018-06-01"
+result_1 <- google_analytics(
+            my_id,
+            date_range = c(startdt,enddt),
+            metrics = c("eventValue"),
+dimensions = selectedDimensions,
+            anti_sample = TRUE
+          )
+
+selectedDimensions <- c("ga:dimension1",
+        "ga:dimension3",
+        "ga:dimension18",
+        "ga:dimension2",
+        "ga:dimension14",
+        "ga:dimension12",
+        "ga:dimension13"
+    )
+result_2 <- google_analytics(
+            my_id,
+            date_range = c(startdt,enddt),
+            metrics = c("eventValue"),
+            dimensions = selectedDimensions,
+            anti_sample = TRUE
+          )
+Keys<- c("dimesnion3")
+Join<-merge(result_1, result_2, by = keys, all.x = TRUE)
